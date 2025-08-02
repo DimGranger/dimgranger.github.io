@@ -10,7 +10,7 @@ class ParentNode(HTMLNode):
         if self.tag is None:
             raise ValueError("A tag is needed for ParentNodes")
         if not self.children:
-            raise ValueError("A tag is needed for ParentNodes")
+            raise ValueError("Children are needed for ParentNodes")
 
         s = "<" + self.tag + self.props_to_html() + ">"
         for x in self.children:
