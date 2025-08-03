@@ -4,6 +4,7 @@ from node_utils import text_node_to_html_node, split_nodes_delimiter, extract_ma
     split_nodes_image, split_nodes_link, text_to_nodes
 from block_utils import markdown_to_blocks, block_to_block_type, BlockType
 from markdown_utils import markdown_to_html_node
+from generate_file_utils import extract_title
 from textnode import TextNode, TextType
 
 
@@ -138,7 +139,7 @@ class MyTestCase(unittest.TestCase):
         )
 
     def test_text_to_nodes(self):
-        text = "This is **text** with an _italic_ word and a ```code block``` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
         nodes = text_to_nodes(text)
         self.assertListEqual(
             [
@@ -204,7 +205,7 @@ This is **bolded** paragraph
 text in a p
 tag here
 
-This is another paragraph with _italic_ text and ```code``` here
+This is another paragraph with _italic_ text and `code` here
 
 """
 
@@ -212,7 +213,7 @@ This is another paragraph with _italic_ text and ```code``` here
         html = node.to_html()
         self.assertEqual(
             html,
-            "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
+            "<div><p>This is <b>bolded</b> paragraph\ntext in a p\ntag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
         )
 
     def test_codeblock(self):
@@ -229,6 +230,30 @@ the **same** even with inline stuff
             html,
             "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff</code></pre></div>",
         )
+
+    def test_list(self):
+        md = """
+- a
+- b
+        """
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+
+    def test_extract_title_no_h1(self):
+        md = "setrcyvubjn"
+
+        def f():
+            return extract_title(md)
+
+        self.assertRaises(Exception, f)
+
+    def test_extract_title(self):
+        md = "# Title \n\n azr"
+        self.assertEqual(extract_title(md), "Title")
+
+    def test_extract_title_whitespace(self):
+        md = "# Title "
+        self.assertEqual(extract_title(md), "Title")
 
 
 if __name__ == '__main__':
